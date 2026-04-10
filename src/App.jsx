@@ -197,39 +197,42 @@ export default function TradeInfinity() {
 
       if (!email || !password) { setAuthError("Please fill in email and password"); setAuthLoading(false); return; }
 
+      // Step 1: Find user by email ONLY (more reliable than double filter)
       const users = await supabaseCall("users", "GET", {
-        filters: { email, password_hash: password },
+        filters: { email },
         select: "*",
         limit: "1",
       });
 
       if (!users || users.length === 0) {
-        setAuthError("Wrong email or password. Check and try again.");
+        setAuthError("No account found with this email. Try signing up first.");
         setAuthLoading(false);
         return;
       }
 
       const user = users[0];
 
-      // Check trial expiry
+      // Step 2: Compare password in JavaScript (avoids filter issues)
+      if (user.password_hash !== password) {
+        setAuthError("Wrong password. Please try again.");
+        setAuthLoading(false);
+        return;
+      }
+
+      // Step 3: Check plan status
       let plan = user.plan;
       let daysLeft = 0;
+      const now = new Date();
 
       if (plan === "trial" && user.trial_end) {
         const trialEnd = new Date(user.trial_end);
-        const now = new Date();
         daysLeft = Math.max(0, Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24)));
         if (daysLeft <= 0) {
           plan = "free";
-          // Update in database
           try {
             await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${user.id}`, {
               method: "PATCH",
-              headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization": `Bearer ${SUPABASE_KEY}`,
-                "Content-Type": "application/json",
-              },
+              headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" },
               body: JSON.stringify({ plan: "free" }),
             });
           } catch (e) {}
