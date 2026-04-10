@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 // ============================================
 const SUPABASE_URL = "https://nccnkjnexzoghustkxrr.supabase.co";  // ← REPLACE THIS
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jY25ram5leHpvZ2h1c3RreHJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NDYwMTUsImV4cCI6MjA5MTMyMjAxNX0.Bvs6hAdVMin0SzwQ0FeTLOsAjmBnnoFp9vb9bciy9-U";                // ← REPLACE THIS
-const BOT_API_URL = "trade-infinity-bot-production.up.railway.app"; // ← REPLACE THIS (your Railway bot URL)
+const BOT_API_URL = "https://trade-infinity-bot-production.up.railway.app"; // ← REPLACE THIS (your Railway bot URL)
 
 // ─── Simple Supabase client (no npm package needed) ───
 async function supabaseCall(table, method, options = {}) {
